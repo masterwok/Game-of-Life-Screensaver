@@ -52,7 +52,7 @@ namespace GameOfLife
             //TopMost = true;
             KeyPreview = true;
 
-            GameOfLife = new GameOfLife(bounds.Width, bounds.Height, 4, .15);
+            GameOfLife = new GameOfLife(bounds.Width, bounds.Height, 5, .15);
             DrawingComplete += DrawingEvent;
         }
 

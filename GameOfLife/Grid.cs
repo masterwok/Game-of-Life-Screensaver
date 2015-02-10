@@ -20,10 +20,8 @@ namespace GameOfLife
         public int ColumnCount { get; private set; }
         public int RowCount { get; private set; }
         public int CellSideLength { get; private set; }
-
-        private int BoxHeight { get; set; }
-        private int BoxWidth { get; set; }
-
+        private int _boxHeight { get; set; }
+        private int _boxWidth { get; set; }
 
         public Grid(int windowWidth, int windowHeight, int cellWidth)
         {
@@ -45,18 +43,18 @@ namespace GameOfLife
             ColumnCount = GetCellCountInSize(CellSideLength, _windowWidth);
             RowCount = GetCellCountInSize(CellSideLength, _windowHeight);
 
-            BoxWidth = ColumnCount * CellSideLength;
-            BoxHeight = RowCount * CellSideLength;
+            _boxWidth = ColumnCount * CellSideLength;
+            _boxHeight = RowCount * CellSideLength;
 
-            var paddingHorizontal = (_windowWidth - BoxWidth) / 2;
-            var paddingVertical = (_windowHeight - BoxHeight) / 2;
+            var paddingHorizontal = (_windowWidth - _boxWidth) / 2;
+            var paddingVertical = (_windowHeight - _boxHeight) / 2;
 
             TopLeft = new Point(paddingHorizontal, paddingVertical);
         }
 
         public void ClearBitmap()
         {
-            Bitmap = new Bitmap(BoxWidth, BoxHeight);
+            Bitmap = new Bitmap(_boxWidth, _boxHeight);
             if (BitmapGraphics != null)
                 BitmapGraphics.Dispose();
             BitmapGraphics = Graphics.FromImage(Bitmap);
