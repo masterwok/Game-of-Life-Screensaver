@@ -48,7 +48,7 @@
             this.Text = "Game of Life";
             this.Click += new System.EventHandler(this.GameOfLifeForm_Click);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.GameOfLifeForm_KeyDown);
-            this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.GameOfLifeForm_MouseMove);
+            //this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.GameOfLifeForm_MouseMove);
             this.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.GameOfLifeForm_PreviewKeyDown);
             this.ResumeLayout(false);
 

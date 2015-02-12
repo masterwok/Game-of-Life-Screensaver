@@ -11,7 +11,6 @@ namespace GameOfLife
     public class GameOfLife : IEnumerator<byte[,]>, IEnumerable<byte[,]>
     {
         private int _currentGenerationCellCount { get; set; }
-        private int _previousGenerationCellCount { get; set; }
         private Random _random = new Random();
         private Grid _grid { get; set; }
 
@@ -21,8 +20,8 @@ namespace GameOfLife
         private int ColorIteration { get; set; }
 
         // Circle vars
-        private const int MAX_CIRCLE_RADIUS = 100;
-        private const double CIRCLE_DROP_THRESHOLD = 0.55;
+        private const int MAX_CIRCLE_RADIUS = 75;
+        private const double CIRCLE_DROP_THRESHOLD = 0.35;
         private int _dropCircleAtCount { get; set; }
 
         public GameOfLife(int windowWidth, int windowHeight, int cellWidth, double ratioAlive)
@@ -73,6 +72,10 @@ namespace GameOfLife
         {
             Tuple<int, int> rowCol;
 
+            // Do nothing if the cell is already alive
+            if (IsAlive(_grid.GetCellValue(row, col)))
+                return;
+
             // Set alive bit to 1
             _grid.SetCellValue(row, col, (byte)(_grid.GetCellValue(row, col) | 1));
 
@@ -90,6 +93,10 @@ namespace GameOfLife
         {
             Tuple<int, int> rowCol;
 
+            // Do nothing if the cell is already dead
+            if (!IsAlive(_grid.GetCellValue(row, col)))
+                return;
+
             // Set alive bit to 0
             _grid.SetCellValue(row, col, (byte)(_grid.GetCellValue(row, col) & 254));
 
@@ -101,6 +108,8 @@ namespace GameOfLife
                     (byte)(GetCellNeighborCount(_grid.GetCellValue(rowCol.Item1, rowCol.Item2)) - 1)));
             }
         }
+
+        #region Circle
 
         /// <summary>
         /// Draw a circlce on the grid at position (r, c) with specified radius.
@@ -121,22 +130,22 @@ namespace GameOfLife
             while (x >= y)
             {
                 pos = GetWrappedPosition(x + r, y + c);
-                _grid.SetCellColorAt(pos, _cellColor);
+                _grid.SetCellColorAt(pos.Item1, pos.Item2, _cellColor);
                 SetCellAlive(pos.Item1, pos.Item2);
                 pos = GetWrappedPosition(-y + r, x + c);
-                _grid.SetCellColorAt(pos, _cellColor);
+                _grid.SetCellColorAt(pos.Item1, pos.Item2, _cellColor);
                 SetCellAlive(pos.Item1, pos.Item2);
                 pos = GetWrappedPosition(-x + r, -y + c);
-                _grid.SetCellColorAt(pos, _cellColor);
+                _grid.SetCellColorAt(pos.Item1, pos.Item2, _cellColor);
                 SetCellAlive(pos.Item1, pos.Item2);
                 pos = GetWrappedPosition(-y + r, -x + c);
-                _grid.SetCellColorAt(pos, _cellColor);
+                _grid.SetCellColorAt(pos.Item1, pos.Item2, _cellColor);
                 SetCellAlive(pos.Item1, pos.Item2);
                 pos = GetWrappedPosition(x + r, -y + c);
-                _grid.SetCellColorAt(pos, _cellColor);
+                _grid.SetCellColorAt(pos.Item1, pos.Item2, _cellColor);
                 SetCellAlive(pos.Item1, pos.Item2);
                 pos = GetWrappedPosition(y + r, -x + c);
-                _grid.SetCellColorAt(pos, _cellColor);
+                _grid.SetCellColorAt(pos.Item1, pos.Item2, _cellColor);
                 SetCellAlive(pos.Item1, pos.Item2);
                 y++;
 
@@ -151,6 +160,22 @@ namespace GameOfLife
                 }
             }
         }
+
+        public void DropCircleIfCellCountHitsThreshhold()
+        {
+            int row, col, radius;
+
+            if (_currentGenerationCellCount < _dropCircleAtCount)
+            {
+                radius = _random.Next(MAX_CIRCLE_RADIUS) + 1;
+                row = _random.Next(_grid.RowCount - 1) + 1;
+                col = _random.Next(_grid.ColumnCount - 1) + 1;
+                DrawCircle(row, col, radius);
+                DrawCircle(row, col, radius + 2);
+            }
+        }
+
+        #endregion
 
         private Tuple<int, int> GetWrappedPosition(int row, int col)
         {
@@ -251,19 +276,6 @@ namespace GameOfLife
             if (ColorIteration > 360) ColorIteration = 0;
         }
 
-        public void DropCircleIfCellCountHitsThreshhold()
-        {
-            int row, col, radius;
-
-            if (_previousGenerationCellCount < _dropCircleAtCount)
-            {
-                radius = _random.Next(MAX_CIRCLE_RADIUS) + 1;
-                row = _random.Next(_grid.RowCount - 1) + 1;
-                col = _random.Next(_grid.ColumnCount - 1) + 1;
-                DrawCircle(row, col, radius);
-            }
-        }
-
         #region IEnumerator
 
         public byte[,] Current
@@ -284,7 +296,7 @@ namespace GameOfLife
         public bool MoveNext()
         {
             byte[,] previousGenerationCells = new byte[_grid.RowCount, _grid.ColumnCount];
-
+            
             _grid.ClearBitmap();
             UpdateCellColor();
 
@@ -328,10 +340,7 @@ namespace GameOfLife
                 }
             }
 
-            // Check to see if we ned
-
-            _previousGenerationCellCount = _currentGenerationCellCount;
-
+            DropCircleIfCellCountHitsThreshhold();
             _grid.DrawBitmap(CurrentGraphics);
 
             return true;

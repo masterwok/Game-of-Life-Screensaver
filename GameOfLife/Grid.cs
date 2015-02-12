@@ -10,29 +10,32 @@ namespace GameOfLife
 {
     public class Grid
     {
+        public Point TopLeft { get; private set; }
+        public byte[,] Cells { get; private set; }
+        public int RowCount { get; private set; }
+        public int ColumnCount { get; private set; }
+        public int CellSideLength { get; private set; }
+        public int Padding { get; private set; }
+
+        private Graphics _bitmapGraphics { get; set; }
+        private SolidBrush _brush { get; set; }
+        private Bitmap _bitmap { get; set; }
         private int _windowHeight { get; set; }
         private int _windowWidth { get; set; }
-        private Graphics BitmapGraphics { get; set; }
-        private SolidBrush Brush { get; set; }
-        private Bitmap Bitmap { get; set; }
-        public Point TopLeft { get; private set; }
-        public int Padding { get; private set; }
-        public int ColumnCount { get; private set; }
-        public int RowCount { get; private set; }
-        public int CellSideLength { get; private set; }
         private int _boxHeight { get; set; }
         private int _boxWidth { get; set; }
-        public byte[,] Cells { get; private set; }
-
+        
         public Grid(int windowWidth, int windowHeight, int cellWidth)
         {
             this._windowHeight = windowHeight;
             this._windowWidth = windowWidth;
             this.CellSideLength = cellWidth;
-            this.Brush = new SolidBrush(Color.CornflowerBlue);
+            this._brush = new SolidBrush(Color.CornflowerBlue);
             this.SetDimensions();
             this.Cells = new byte[RowCount, ColumnCount];
         }
+
+        #region Sizing
 
         private int GetCellCountInSize(int cellSideLength, int size)
         {
@@ -54,32 +57,33 @@ namespace GameOfLife
             TopLeft = new Point(paddingHorizontal, paddingVertical);
         }
 
+        #endregion
+
+        #region Graphics
+
         public void ClearBitmap()
         {
-            Bitmap = new Bitmap(_boxWidth, _boxHeight);
-            if (BitmapGraphics != null)
-                BitmapGraphics.Dispose();
-            BitmapGraphics = Graphics.FromImage(Bitmap);
+            _bitmap = new Bitmap(_boxWidth, _boxHeight);
+            if (_bitmapGraphics != null)
+                _bitmapGraphics.Dispose();
+            _bitmapGraphics = Graphics.FromImage(_bitmap);
         }
 
         public void SetCellColorAt(int row, int col, Color color)
         {
-            Brush.Color = color;
+            _brush.Color = color;
             int x = (col * CellSideLength);
             int y = (row * CellSideLength);
 
-            BitmapGraphics.FillRectangle(Brush, x, y, CellSideLength, CellSideLength);
-        }
-
-        public void SetCellColorAt(Tuple<int, int> position, Color color)
-        {
-            SetCellColorAt(position.Item1, position.Item2, color);
+            _bitmapGraphics.FillRectangle(_brush, x, y, CellSideLength, CellSideLength);
         }
 
         public void DrawBitmap(Graphics g)
         {
-            g.DrawImage(Bitmap, TopLeft);
+            g.DrawImage(_bitmap, TopLeft);
         }
+
+        #endregion
 
         public void SetCellValue(int row, int col, byte value)
         {
