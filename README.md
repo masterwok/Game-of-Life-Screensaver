@@ -6,5 +6,3 @@ I got bored one day and decided to implement Conway's Game of Life as a windows 
 TODO:
 
 o Implement configuration form.
-
-o Fix out-of-bounds exception from circle wrapping and uncomment the code that drops the circles.
