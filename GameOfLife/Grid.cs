@@ -22,6 +22,7 @@ namespace GameOfLife
         public int CellSideLength { get; private set; }
         private int _boxHeight { get; set; }
         private int _boxWidth { get; set; }
+        public byte[,] Cells { get; private set; }
 
         public Grid(int windowWidth, int windowHeight, int cellWidth)
         {
@@ -30,6 +31,7 @@ namespace GameOfLife
             this.CellSideLength = cellWidth;
             this.Brush = new SolidBrush(Color.CornflowerBlue);
             this.SetDimensions();
+            this.Cells = new byte[RowCount, ColumnCount];
         }
 
         private int GetCellCountInSize(int cellSideLength, int size)
@@ -79,6 +81,14 @@ namespace GameOfLife
             g.DrawImage(Bitmap, TopLeft);
         }
 
+        public void SetCellValue(int row, int col, byte value)
+        {
+            Cells[row, col] = value;
+        }
 
+        public byte GetCellValue(int row, int col)
+        {
+            return Cells[row, col];
+        }
     }
 }

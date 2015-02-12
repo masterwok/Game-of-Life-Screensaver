@@ -10,10 +10,9 @@ namespace GameOfLife
 {
     public class GameOfLife : IEnumerator<byte[,]>, IEnumerable<byte[,]>
     {
-        public byte[,] Cells { get; private set; }
-        private int CurrentGenerationCellCount { get; set; }
-        private Random random = new Random();
-        public Grid Grid { get; set; }
+        private int _currentGenerationCellCount { get; set; }
+        private Random _random = new Random();
+        private Grid _grid { get; set; }
 
         // Graphics vars
         public Graphics CurrentGraphics { get; set; }
@@ -21,32 +20,32 @@ namespace GameOfLife
         private int ColorIteration { get; set; }
 
         // Circle vars
-        private const int MAX_CIRCLE_RADIUS = 40;
-        private const double CIRCLE_DROP_THRESHOLD = 0.25;
+        private const int MAX_CIRCLE_RADIUS = 100;
+        private const double CIRCLE_DROP_THRESHOLD = 0.55;
         private int _dropCircleAtCount { get; set; }
 
         public GameOfLife(int windowWidth, int windowHeight, int cellWidth, double ratioAlive)
         {
-            Grid = new Grid(windowWidth, windowHeight, cellWidth);
-            _dropCircleAtCount = (int)((Grid.RowCount * Grid.ColumnCount * ratioAlive) * CIRCLE_DROP_THRESHOLD);
+            _grid = new Grid(windowWidth, windowHeight, cellWidth);
+            _dropCircleAtCount = (int)((_grid.RowCount * _grid.ColumnCount * ratioAlive) * CIRCLE_DROP_THRESHOLD);
             GenerateSeedGeneration(ratioAlive);
         }
 
         public void GenerateSeedGeneration(double ratioAlive)
         {
-            Cells = new byte[Grid.RowCount, Grid.ColumnCount];
-            int aliveCells = (int)(Grid.RowCount * Grid.ColumnCount * ratioAlive);
+            //Cells = new byte[Grid.RowCount, Grid.ColumnCount];
+            int aliveCells = (int)(_grid.RowCount * _grid.ColumnCount * ratioAlive);
             int n = 0;
 
-            if (aliveCells > Grid.RowCount * Grid.ColumnCount)
+            if (aliveCells > _grid.RowCount * _grid.ColumnCount)
                 throw new Exception("Number of alive cells must be less or equal to number of total cells");
 
             while (n < aliveCells)
             {
-                int r = random.Next(0, Grid.RowCount);
-                int c = random.Next(0, Grid.ColumnCount);
+                int r = _random.Next(0, _grid.RowCount);
+                int c = _random.Next(0, _grid.ColumnCount);
 
-                if (!IsAlive(Cells[r, c]))
+                if (!IsAlive(_grid.GetCellValue(r, c)))
                 {
                     SetCellAlive(r, c);
                     n++;
@@ -74,14 +73,17 @@ namespace GameOfLife
         private void SetCellAlive(int row, int col)
         {
             Tuple<int, int> rowCol;
-            Cells[row, col] = (byte)(Cells[row, col] | 1);
 
+            // Set alive bit
+            _grid.SetCellValue(row, col, (byte)(_grid.GetCellValue(row, col) | 1));
+            
             // Increment neighbor cells
             foreach (Position position in Enum.GetValues(typeof(Position)).Cast<Position>())
             {
-                rowCol = position.GetPosition(row, col, Grid.RowCount, Grid.ColumnCount);
-                Cells[rowCol.Item1, rowCol.Item2] = SetCellNeighborCount(Cells[rowCol.Item1, rowCol.Item2],
-                    (byte)(GetCellNeighborCount(Cells[rowCol.Item1, rowCol.Item2]) + 1));
+                rowCol = position.GetPosition(row, col, _grid.RowCount, _grid.ColumnCount);
+                _grid.SetCellValue(rowCol.Item1, rowCol.Item2, SetCellNeighborCount(_grid.GetCellValue(rowCol.Item1, rowCol.Item2),
+                    (byte)(GetCellNeighborCount(_grid.GetCellValue(rowCol.Item1, rowCol.Item2)) + 1)));
+
             }
         }
 
@@ -93,14 +95,15 @@ namespace GameOfLife
         private void SetCellDead(int row, int col)
         {
             Tuple<int, int> rowCol;
-            Cells[row, col] = (byte)(Cells[row, col] & 254);
+
+            _grid.SetCellValue(row, col, (byte)(_grid.GetCellValue(row, col) & 254));
 
             // Increment neighbor cells
             foreach (Position position in Enum.GetValues(typeof(Position)).Cast<Position>())
             {
-                rowCol = position.GetPosition(row, col, Grid.RowCount, Grid.ColumnCount);
-                Cells[rowCol.Item1, rowCol.Item2] = SetCellNeighborCount(Cells[rowCol.Item1, rowCol.Item2],
-                    (byte)(GetCellNeighborCount(Cells[rowCol.Item1, rowCol.Item2]) - 1));
+                rowCol = position.GetPosition(row, col, _grid.RowCount, _grid.ColumnCount);
+                _grid.SetCellValue(rowCol.Item1, rowCol.Item2, SetCellNeighborCount(_grid.GetCellValue(rowCol.Item1, rowCol.Item2),
+                    (byte)(GetCellNeighborCount(_grid.GetCellValue(rowCol.Item1, rowCol.Item2)) - 1)));
             }
         }
 
@@ -121,28 +124,28 @@ namespace GameOfLife
             while (x >= y)
             {
                 pos = GetWrappedPosition(x + r, y + c);
-                Grid.SetCellColorAt(pos, _cellColor);
+                _grid.SetCellColorAt(pos, _cellColor);
                 SetCellAlive(pos);
                 pos = GetWrappedPosition(y + r, x + c);
-                Grid.SetCellColorAt(pos, _cellColor);
+                _grid.SetCellColorAt(pos, _cellColor);
                 SetCellAlive(pos);
                 pos = GetWrappedPosition(-x + r, y + c);
-                Grid.SetCellColorAt(pos, _cellColor);
+                _grid.SetCellColorAt(pos, _cellColor);
                 SetCellAlive(pos);
                 pos = GetWrappedPosition(-y + r, x + c);
-                Grid.SetCellColorAt(pos, _cellColor);
+                _grid.SetCellColorAt(pos, _cellColor);
                 SetCellAlive(pos);
                 pos = GetWrappedPosition(-x + r, -y + c);
-                Grid.SetCellColorAt(pos, _cellColor);
+                _grid.SetCellColorAt(pos, _cellColor);
                 SetCellAlive(pos);
                 pos = GetWrappedPosition(-y + r, -x + c);
-                Grid.SetCellColorAt(pos, _cellColor);
+                _grid.SetCellColorAt(pos, _cellColor);
                 SetCellAlive(pos);
                 pos = GetWrappedPosition(x + r, -y + c);
-                Grid.SetCellColorAt(pos, _cellColor);
+                _grid.SetCellColorAt(pos, _cellColor);
                 SetCellAlive(pos);
                 pos = GetWrappedPosition(y + r, -x + c);
-                Grid.SetCellColorAt(pos, _cellColor);
+                _grid.SetCellColorAt(pos, _cellColor);
                 SetCellAlive(pos);
                 y++;
 
@@ -160,10 +163,10 @@ namespace GameOfLife
 
         private Tuple<int, int> GetWrappedPosition(int row, int col)
         {
-            row = row % Grid.RowCount;
-            row = row < 0 ? row + Grid.RowCount : row;
-            col = col % Grid.ColumnCount;
-            col = col < 0 ? col + Grid.ColumnCount : col;
+            row = row % _grid.RowCount;
+            row = row < 0 ? row + _grid.RowCount : row;
+            col = col % _grid.ColumnCount;
+            col = col < 0 ? col + _grid.ColumnCount : col;
 
             return new Tuple<int, int>(row, col);
         }
@@ -259,13 +262,13 @@ namespace GameOfLife
 
         public void HandleCircleDrop()
         {
-            int row, col, radius;
+            //int row, col, radius;
 
-            //if (CurrentGenerationCellCount < _dropCircleAtCount)
+            //if (_currentGenerationCellCount < _dropCircleAtCount)
             //{
-            //    radius = random.Next(MAX_CIRCLE_RADIUS) + 1;
-            //    row = random.Next(Grid.RowCount - 1) + 1;
-            //    col = random.Next(Grid.ColumnCount - 1) + 1;
+            //    radius = _random.Next(MAX_CIRCLE_RADIUS) + 1;
+            //    row = _random.Next(_grid.RowCount - 1) + 1;
+            //    col = _random.Next(_grid.ColumnCount - 1) + 1;
             //    DrawCircle(row, col, radius);
             //}
         }
@@ -274,7 +277,7 @@ namespace GameOfLife
 
         public byte[,] Current
         {
-            get { return Cells; }
+            get { return _grid.Cells; }
         }
 
         public void Dispose()
@@ -284,21 +287,21 @@ namespace GameOfLife
 
         object IEnumerator.Current
         {
-            get { return Cells; }
+            get { return _grid.Cells; }
         }
 
         public bool MoveNext()
         {
-            byte[,] tmpCells = new byte[Grid.RowCount, Grid.ColumnCount];
-            Array.Copy(Cells, tmpCells, Cells.Length);
+            byte[,] tmpCells = new byte[_grid.RowCount, _grid.ColumnCount];
+            Array.Copy(_grid.Cells, tmpCells, _grid.Cells.Length);
 
-            Grid.ClearBitmap();
+            _grid.ClearBitmap();
             UpdateCellColor();
 
             // Draw normal generation
-            for (int r = 0; r < Grid.RowCount; r++)
+            for (int r = 0; r < _grid.RowCount; r++)
             {
-                for (int c = 0; c < Grid.ColumnCount; c++)
+                for (int c = 0; c < _grid.ColumnCount; c++)
                 {
                     // Only look at non zero cells
                     if (tmpCells[r, c] != 0)
@@ -310,8 +313,8 @@ namespace GameOfLife
                                 SetCellDead(r, c); // clear cell
                             else
                             {
-                                Grid.SetCellColorAt(r, c, _cellColor);
-                                CurrentGenerationCellCount++;
+                                _grid.SetCellColorAt(r, c, _cellColor);
+                                _currentGenerationCellCount++;
                             }
                         }
                         else
@@ -319,8 +322,8 @@ namespace GameOfLife
                             if (count == 3)
                             {
                                 SetCellAlive(r, c); // set sell
-                                Grid.SetCellColorAt(r, c, _cellColor);
-                                CurrentGenerationCellCount++;
+                                _grid.SetCellColorAt(r, c, _cellColor);
+                                _currentGenerationCellCount++;
                             }
                         }
                     }
@@ -329,9 +332,9 @@ namespace GameOfLife
             }
 
             HandleCircleDrop();
-            CurrentGenerationCellCount = 0;
+            _currentGenerationCellCount = 0;
 
-            Grid.DrawBitmap(CurrentGraphics);
+            _grid.DrawBitmap(CurrentGraphics);
 
             return true;
         }
