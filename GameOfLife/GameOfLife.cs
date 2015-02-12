@@ -10,16 +10,13 @@ namespace GameOfLife
 {
     public class GameOfLife : IEnumerator<byte[,]>, IEnumerable<byte[,]>
     {
+        public Graphics CurrentGraphics { get; set; }
+        
         private int _currentGenerationCellCount { get; set; }
         private Random _random = new Random();
         private Grid _grid { get; set; }
-
-        // Graphics vars
-        public Graphics CurrentGraphics { get; set; }
         private Color _cellColor { get; set; }
-        private int ColorIteration { get; set; }
-
-        // Circle vars
+        private int _colorIteration { get; set; }
         private const int MAX_CIRCLE_RADIUS = 75;
         private const double CIRCLE_DROP_THRESHOLD = 0.35;
         private int _dropCircleAtCount { get; set; }
@@ -272,8 +269,8 @@ namespace GameOfLife
 
         public void UpdateCellColor()
         {
-            _cellColor = GetRgbFromHsv(ColorIteration++, 1, 1);
-            if (ColorIteration > 360) ColorIteration = 0;
+            _cellColor = GetRgbFromHsv(_colorIteration++, 1, 1);
+            if (_colorIteration > 360) _colorIteration = 0;
         }
 
         #region IEnumerator

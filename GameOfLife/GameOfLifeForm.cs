@@ -34,10 +34,14 @@ namespace GameOfLife
         #endregion
 
         public int CellSide { get; set; }
-        protected GameOfLife GameOfLife { get; set; }
         public event EventHandler DrawingComplete;
-        private Point mouseLocation;
-        private bool IsPreview { get; set; }
+
+        private GameOfLife _gameOfLife { get; set; }
+        private Point _mouseLocation;
+        private bool _isPreview { get; set; }
+        private const int FRAMES_PER_SECOND = 1000;
+        private const int SKIP_TICKS = 1000 / FRAMES_PER_SECOND;
+        private int _nextGameTick = Environment.TickCount;
 
         public GameOfLifeForm(Rectangle bounds)
         {
@@ -52,14 +56,14 @@ namespace GameOfLife
             //TopMost = true;
             KeyPreview = true;
 
-            GameOfLife = new GameOfLife(bounds.Width, bounds.Height, 5, .15);
+            _gameOfLife = new GameOfLife(bounds.Width, bounds.Height, 5, .15);
             DrawingComplete += DrawingEvent;
         }
 
         public GameOfLifeForm(IntPtr previewHandle)
         {
             Rectangle parentRect;
-            IsPreview = true;
+            _isPreview = true;
 
             this.SetStyle(ControlStyles.AllPaintingInWmPaint
                 | ControlStyles.UserPaint
@@ -83,7 +87,7 @@ namespace GameOfLife
             Size = parentRect.Size;
             //Size = new Size(parentRect.Width, parentRect.Height);
             Location = new Point(0, 0);
-            GameOfLife = new GameOfLife(parentRect.Width, parentRect.Height, 4, 0.15);
+            _gameOfLife = new GameOfLife(parentRect.Width, parentRect.Height, 4, 0.15);
 
             DrawingComplete += DrawingEvent;
         }
@@ -91,48 +95,55 @@ namespace GameOfLife
         public void DrawingEvent(Object sender, EventArgs e)
         {
             this.Invalidate();
+
+            // Enforce FPS
+            _nextGameTick += SKIP_TICKS;
+            var sleepTime = _nextGameTick - Environment.TickCount;
+            if (sleepTime > 0)
+                Thread.Sleep(sleepTime);
+
         }
 
         protected override void OnPaint(PaintEventArgs e)
         {
-            GameOfLife.CurrentGraphics = e.Graphics;
-            GameOfLife.MoveNext();
+            _gameOfLife.CurrentGraphics = e.Graphics;
+            _gameOfLife.MoveNext();
             DrawingComplete(this, EventArgs.Empty);
         }
 
         private void GameOfLifeForm_Click(object sender, EventArgs e)
         {
-            if (!IsPreview)
+            if (!_isPreview)
                 Application.Exit();
         }
 
         private void GameOfLifeForm_KeyDown(object sender, KeyEventArgs e)
         {
-            if (!IsPreview)
+            if (!_isPreview)
                 Application.Exit();
         }
 
         private void GameOfLifeForm_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
         {
-            if (!IsPreview)
+            if (!_isPreview)
                 Application.Exit();
         }
 
         private void GameOfLifeForm_MouseMove(object sender, MouseEventArgs e)
         {
-            if (IsPreview)
+            if (_isPreview)
                 return;
 
-            if (!mouseLocation.IsEmpty)
+            if (!_mouseLocation.IsEmpty)
             {
                 // check for significant difference
-                if (Math.Abs(mouseLocation.X - e.X) > 5 ||
-                    Math.Abs(mouseLocation.Y - e.Y) > 5)
+                if (Math.Abs(_mouseLocation.X - e.X) > 5 ||
+                    Math.Abs(_mouseLocation.Y - e.Y) > 5)
                     Application.Exit();
             }
 
             // update location
-            mouseLocation = e.Location;
+            _mouseLocation = e.Location;
         }
 
     }
