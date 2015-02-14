@@ -103,27 +103,33 @@
             // 
             this.CellSizeTracker.Location = new System.Drawing.Point(224, 18);
             this.CellSizeTracker.Maximum = 100;
+            this.CellSizeTracker.Minimum = 1;
             this.CellSizeTracker.Name = "CellSizeTracker";
             this.CellSizeTracker.Size = new System.Drawing.Size(385, 56);
             this.CellSizeTracker.TabIndex = 5;
+            this.CellSizeTracker.Value = 1;
             this.CellSizeTracker.ValueChanged += new System.EventHandler(this.CellSizeTracker_ValueChanged);
             // 
             // SeedPopulationDensityTracker
             // 
             this.SeedPopulationDensityTracker.Location = new System.Drawing.Point(224, 80);
             this.SeedPopulationDensityTracker.Maximum = 100;
+            this.SeedPopulationDensityTracker.Minimum = 1;
             this.SeedPopulationDensityTracker.Name = "SeedPopulationDensityTracker";
             this.SeedPopulationDensityTracker.Size = new System.Drawing.Size(385, 56);
             this.SeedPopulationDensityTracker.TabIndex = 6;
+            this.SeedPopulationDensityTracker.Value = 1;
             this.SeedPopulationDensityTracker.ValueChanged += new System.EventHandler(this.SeedPopulationDensityTracker_ValueChanged);
             // 
             // MaxCircleRadiusTracker
             // 
             this.MaxCircleRadiusTracker.Location = new System.Drawing.Point(224, 142);
             this.MaxCircleRadiusTracker.Maximum = 100;
+            this.MaxCircleRadiusTracker.Minimum = 1;
             this.MaxCircleRadiusTracker.Name = "MaxCircleRadiusTracker";
             this.MaxCircleRadiusTracker.Size = new System.Drawing.Size(385, 56);
             this.MaxCircleRadiusTracker.TabIndex = 7;
+            this.MaxCircleRadiusTracker.Value = 1;
             this.MaxCircleRadiusTracker.ValueChanged += new System.EventHandler(this.MaxCircleRadiusTracker_ValueChanged);
             // 
             // MaxFpsTextbox
@@ -140,9 +146,11 @@
             // 
             this.CircleDropThresholdTracker.Location = new System.Drawing.Point(224, 204);
             this.CircleDropThresholdTracker.Maximum = 100;
+            this.CircleDropThresholdTracker.Minimum = 1;
             this.CircleDropThresholdTracker.Name = "CircleDropThresholdTracker";
             this.CircleDropThresholdTracker.Size = new System.Drawing.Size(385, 56);
             this.CircleDropThresholdTracker.TabIndex = 10;
+            this.CircleDropThresholdTracker.Value = 1;
             this.CircleDropThresholdTracker.ValueChanged += new System.EventHandler(this.CircleDropThresholdTracker_ValueChanged);
             // 
             // label5

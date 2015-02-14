@@ -183,7 +183,7 @@ namespace GameOfLife
         {
             try
             {
-                _settings.MaxFps = BoundValue((int)Math.Floor(Double.Parse(MaxFpsTextbox.Text)), 0, 999);
+                _settings.MaxFps = BoundValue((int)Math.Floor(Double.Parse(MaxFpsTextbox.Text)), 1, 999);
                 MaxFpsTextbox.Text = _settings.MaxFps.ToString();
                 MaxFpsTextbox.Select(MaxFpsTextbox.Text.Length, 0);
             }
