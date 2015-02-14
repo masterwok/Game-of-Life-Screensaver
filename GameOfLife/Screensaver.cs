@@ -59,8 +59,8 @@ namespace GameOfLife
             {
                 case 'c':
                     // Show the screensaver configuration dialog box
-                    MessageBox.Show(String.Format("Configuration not implemented"),
-                        "Screen Saver", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    new SettingsForm().Show();
+                    Application.Run();
                     break;
                 case 'p':
                     // Show the screensaver in the screensaver selection dialog box
@@ -90,8 +90,8 @@ namespace GameOfLife
         private void ShowScreenSaver()
         {
             foreach (Screen screen in Screen.AllScreens)
-                new GameOfLifeForm(screen.Bounds).Show();
-        }
+                        new GameOfLifeForm(screen.Bounds).Show();
+}
 
     }
 }

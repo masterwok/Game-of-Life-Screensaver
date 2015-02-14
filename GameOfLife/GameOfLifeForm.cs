@@ -33,14 +33,13 @@ namespace GameOfLife
 
         #endregion
 
-        public int CellSide { get; set; }
+        //public int CellSide { get; set; }
         public event EventHandler DrawingComplete;
 
         private GameOfLife _gameOfLife { get; set; }
         private Point _mouseLocation;
         private bool _isPreview { get; set; }
-        private const int FRAMES_PER_SECOND = 1000;
-        private const int SKIP_TICKS = 1000 / FRAMES_PER_SECOND;
+        private int _skipTicks = 1000 / Settings.CurrentSettings.MaxFps;
         private int _nextGameTick = Environment.TickCount;
 
         public GameOfLifeForm(Rectangle bounds)
@@ -53,10 +52,11 @@ namespace GameOfLife
 
             Cursor.Hide();
             Bounds = bounds;
-            //TopMost = true;
+            TopMost = true;
             KeyPreview = true;
 
-            _gameOfLife = new GameOfLife(bounds.Width, bounds.Height, 5, .15);
+            _gameOfLife = new GameOfLife(bounds.Width, bounds.Height,
+                Settings.CurrentSettings.CellSize, (double)Settings.CurrentSettings.SeedPopulationDensity / 100);
             DrawingComplete += DrawingEvent;
         }
 
@@ -97,7 +97,7 @@ namespace GameOfLife
             this.Invalidate();
 
             // Enforce FPS
-            _nextGameTick += SKIP_TICKS;
+            _nextGameTick += _skipTicks;
             var sleepTime = _nextGameTick - Environment.TickCount;
             if (sleepTime > 0)
                 Thread.Sleep(sleepTime);

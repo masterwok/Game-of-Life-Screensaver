@@ -11,21 +11,28 @@ namespace GameOfLife
     public class GameOfLife : IEnumerator<byte[,]>, IEnumerable<byte[,]>
     {
         public Graphics CurrentGraphics { get; set; }
-        
+
         private int _currentGenerationCellCount { get; set; }
         private Random _random = new Random();
         private Grid _grid { get; set; }
         private Color _cellColor { get; set; }
         private int _colorIteration { get; set; }
-        private const int MAX_CIRCLE_RADIUS = 75;
-        private const double CIRCLE_DROP_THRESHOLD = 0.35;
         private int _dropCircleAtCount { get; set; }
 
         public GameOfLife(int windowWidth, int windowHeight, int cellWidth, double ratioAlive)
         {
             _grid = new Grid(windowWidth, windowHeight, cellWidth);
-            _dropCircleAtCount = (int)((_grid.RowCount * _grid.ColumnCount * ratioAlive) * CIRCLE_DROP_THRESHOLD);
+            _dropCircleAtCount = (int)((_grid.RowCount * _grid.ColumnCount * ratioAlive * ((double)Settings.CurrentSettings.CircleDropThreshold / 100)));
             GenerateSeedGeneration(ratioAlive);
+            _currentGenerationCellCount = -1;
+
+            if (!Settings.CurrentSettings.CycledColorsOn)
+            {
+                _cellColor = Color.FromArgb(
+                    Settings.CurrentSettings.RedValue,
+                    Settings.CurrentSettings.GreenValue,
+                    Settings.CurrentSettings.BlueValue);
+            }
         }
 
         public void GenerateSeedGeneration(double ratioAlive)
@@ -162,9 +169,9 @@ namespace GameOfLife
         {
             int row, col, radius;
 
-            if (_currentGenerationCellCount < _dropCircleAtCount)
+            if (_currentGenerationCellCount > 0 && _currentGenerationCellCount < _dropCircleAtCount)
             {
-                radius = _random.Next(MAX_CIRCLE_RADIUS) + 1;
+                radius = _random.Next(Settings.CurrentSettings.MaxCircleRadius) + 1;
                 row = _random.Next(_grid.RowCount - 1) + 1;
                 col = _random.Next(_grid.ColumnCount - 1) + 1;
                 DrawCircle(row, col, radius);
@@ -293,12 +300,12 @@ namespace GameOfLife
         public bool MoveNext()
         {
             byte[,] previousGenerationCells = new byte[_grid.RowCount, _grid.ColumnCount];
-            
-            _grid.ClearBitmap();
-            UpdateCellColor();
 
-            // Drop circle in previous generation
-            //DropCircleIfCellCountHitsThreshhold();
+            _grid.ClearBitmap();
+
+            // Only update cell color if color cycling enabled
+            if (Settings.CurrentSettings.CycledColorsOn)
+                UpdateCellColor();
 
             // Copy generation into new grid
             Array.Copy(_grid.Cells, previousGenerationCells, _grid.Cells.Length);
