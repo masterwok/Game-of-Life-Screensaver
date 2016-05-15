@@ -1,7 +1,2 @@
-# GameOfLife
 
-Conway's game of life screensaver, see github wiki for more information.  
-  
-GitHub Page: https://github.com/masterwok/GameOfLife  
-Written by: Jonathan Trowbridge
-
+Conway's game of life screensaver, should build with no problemo using Visual Studio.
